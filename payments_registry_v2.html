@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Климэйт · Заявки на оплату</title>
+<style>
+  :root{
+    --bg:#f6f7f9;
+    --panel:#ffffff;
+    --border:#e6e8ec;
+    --border-soft:#eef0f3;
+    --text:#1b2333;
+    --text-dim:#6b7280;
+    --text-faint:#9aa1ac;
+    --accent:#2f6fed;
+    --accent-soft:#eaf1ff;
+    --green:#12875a;
+    --green-soft:#e7f7ef;
+    --amber:#b8860b;
+    --amber-soft:#fdf5e2;
+    --red:#d94848;
+    --red-soft:#fdeceb;
+    --radius:10px;
+    --mono: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:13.5px;
+  }
+
+  .main{max-width:1440px;margin:0 auto;padding:26px 28px 60px 28px;}
+  .page-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .page-title{font-size:19px;font-weight:700;}
+  .page-sub{font-size:12.5px;color:var(--text-dim);margin-top:2px;}
+  .btn-primary{
+    background:var(--accent);color:#fff;border:none;
+    padding:9px 16px;border-radius:8px;font-weight:600;font-size:13px;
+    cursor:pointer;display:flex;align-items:center;gap:6px;
+  }
+  .btn-primary:hover{background:#2159c9;}
+  .btn-primary svg{width:15px;height:15px;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+  }
+  .filters{
+    padding:14px 16px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .filters select, .filters input[type=text]{
+    border:1px solid var(--border);
+    background:#fbfbfc;
+    border-radius:7px;
+    padding:7px 10px;
+    font-size:12.5px;
+    color:var(--text);
+    min-width:130px;
+    max-width:210px;
+  }
+  .filters select:focus, .filters input:focus{outline:2px solid var(--accent-soft);border-color:var(--accent);}
+  .btn-ghost{
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:7px;
+    padding:7px 12px;
+    font-size:12.5px;
+    color:var(--text-dim);
+    cursor:pointer;
+  }
+  .btn-ghost:hover{background:var(--border-soft);color:var(--text);}
+  .btn-search{
+    border:none;background:var(--accent);color:#fff;
+    border-radius:7px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer;
+  }
+  .btn-search:hover{background:#2159c9;}
+  .btn-add{
+    width:32px;height:32px;border-radius:7px;border:1px solid var(--border);
+    background:#fff;color:var(--text-dim);font-size:16px;cursor:pointer;flex-shrink:0;
+  }
+  .btn-add:hover{background:var(--border-soft);}
+  .filters .spacer{flex:1;}
+  .toggle-wrap{
+    display:flex;align-items:center;gap:8px;
+    font-size:12.5px;color:var(--text-dim);white-space:nowrap;
+  }
+  .switch{
+    position:relative;width:34px;height:19px;border-radius:20px;
+    background:#d7dbe1;cursor:pointer;transition:.15s;flex-shrink:0;
+  }
+  .switch.on{background:var(--accent);}
+  .switch .knob{
+    position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;
+    background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25);
+  }
+  .switch.on .knob{left:17px;}
+
+  .table-card{overflow:hidden;}
+  .table-scroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;min-width:1220px;}
+  thead th{
+    position:sticky;top:0;background:#fbfbfc;z-index:1;
+    text-align:left;font-size:11px;font-weight:700;color:var(--text-faint);
+    text-transform:uppercase;letter-spacing:.05em;
+    padding:11px 12px;border-bottom:1px solid var(--border);white-space:nowrap;
+  }
+  thead th.right{text-align:right;}
+  tbody td{
+    padding:10px 12px;
+    border-bottom:1px solid var(--border-soft);
+    white-space:nowrap;
+    color:var(--text);
+    vertical-align:middle;
+  }
+  tbody tr:hover{background:#f9fafc;}
+  tbody tr:last-child td{border-bottom:none;}
+  .checkbox{width:15px;height:15px;accent-color:var(--accent);}
+
+  .contractor{display:flex;align-items:center;gap:8px;}
+  .contractor .ic{
+    width:22px;height:22px;border-radius:50%;background:#eef0f3;color:#8b93a1;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:default;
+    position:relative;
+  }
+  .contractor .ic svg{width:12px;height:12px;}
+  .contractor-name{font-weight:500;max-width:230px;overflow:hidden;text-overflow:ellipsis;}
+
+  .article{color:var(--text-dim);}
+  .account{color:var(--text-dim);}
+
+  .sum{font-family:var(--mono);font-weight:600;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:6px;}
+  .sum svg{width:12px;height:12px;color:var(--text-faint);}
+
+  .doc-icon{width:15px;height:15px;color:var(--text-faint);cursor:pointer;}
+  .doc-icon:hover{color:var(--accent);}
+  .info-icon{width:14px;height:14px;color:var(--text-faint);cursor:pointer;}
+
+  .app-id{color:var(--text-dim);font-family:var(--mono);}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap;
+  }
+  .pill svg{width:11px;height:11px;}
+  .pill.signed{background:var(--accent-soft);color:var(--accent);}
+  .pill.paid{background:var(--green-soft);color:var(--green);}
+  .pill.rejected{background:var(--red-soft);color:var(--red);}
+
+  .row-action{
+    width:26px;height:26px;border-radius:6px;border:1px solid var(--border);
+    background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  }
+  .row-action:hover{background:var(--border-soft);}
+  .row-action svg{width:13px;height:13px;color:var(--text-dim);}
+
+  .approve-cell{display:flex;align-items:center;gap:6px;}
+  .circle-btn{
+    width:26px;height:26px;border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+  .circle-btn svg{width:14px;height:14px;}
+  .circle-btn.approve{background:var(--green-soft);color:var(--green);}
+  .circle-btn.approve:hover{background:var(--green);color:#fff;}
+  .circle-btn.decline{background:var(--red-soft);color:var(--red);}
+  .circle-btn.decline:hover{background:var(--red);color:#fff;}
+  .circle-btn.pay{background:var(--accent-soft);color:var(--accent);}
+  .circle-btn.pay:hover{background:var(--accent);color:#fff;}
+
+  .signed-tag{display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--accent);font-weight:600;}
+  .signed-tag .x{color:var(--text-faint);cursor:pointer;font-weight:400;}
+  .signed-tag .x:hover{color:var(--red);}
+
+  .reason-row td{background:#fafbfc;padding:10px 12px 14px 12px;}
+  .reason-box{display:flex;align-items:center;gap:8px;max-width:420px;}
+  .reason-box input{
+    flex:1;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12.5px;
+  }
+  .reason-box .save-link{color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .reason-box .save-link:hover{text-decoration:underline;}
+  .reason-note{font-size:11.5px;color:var(--text-faint);margin-top:4px;}
+
+  .table-foot{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 16px;font-size:12px;color:var(--text-faint);
+    border-top:1px solid var(--border);
+  }
+
+  ::-webkit-scrollbar{height:8px;width:8px;}
+  ::-webkit-scrollbar-thumb{background:#d7dbe1;border-radius:8px;}
+
+  /* ---------- Drawer ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,24,33,.35);
+    opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:40;
+  }
+  .overlay.open{opacity:1;pointer-events:auto;}
+
+  .drawer{
+    position:fixed;top:0;right:0;bottom:0;
+    width:460px;max-width:92vw;
+    background:var(--panel);
+    box-shadow:-18px 0 40px rgba(20,24,33,.14);
+    transform:translateX(100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+    z-index:41;
+    display:flex;flex-direction:column;
+  }
+  .drawer.open{transform:translateX(0);}
+  .drawer-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 24px;border-bottom:1px solid var(--border);
+  }
+  .drawer-head h2{margin:0;font-size:16px;font-weight:700;}
+  .drawer-head .sub{font-size:12px;color:var(--text-dim);margin-top:2px;font-weight:400;}
+  .drawer-close{
+    width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);
+  }
+  .drawer-close:hover{background:var(--border-soft);}
+  .drawer-close svg{width:15px;height:15px;}
+  .drawer-body{padding:22px 24px;overflow-y:auto;flex:1;}
+  .drawer-foot{
+    padding:16px 24px;border-top:1px solid var(--border);
+    display:flex;gap:10px;align-items:center;
+  }
+
+  .field{position:relative;margin-bottom:22px;}
+  .field label{
+    position:absolute;top:-8px;left:11px;background:#fff;padding:0 5px;
+    font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:.02em;
+  }
+  .field .req{color:var(--red);}
+  .field-box{
+    border:1px solid var(--border);border-radius:9px;padding:11px 12px;
+    display:flex;align-items:center;gap:8px;background:#fdfdfe;
+  }
+  .field-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .field-box input, .field-box select, .field-box textarea{
+    border:none;outline:none;background:transparent;font-size:13px;color:var(--text);
+    width:100%;font-family:inherit;
+  }
+  .field-box textarea{resize:vertical;min-height:56px;}
+  .field-box.select{cursor:pointer;}
+  .field-box select{appearance:none;cursor:pointer;}
+  .chev{width:13px;height:13px;color:var(--text-faint);flex-shrink:0;}
+  .field-row{display:flex;gap:14px;}
+  .field-row .field{flex:1;}
+
+  .mini-add{
+    display:flex;align-items:center;gap:7px;color:var(--accent);font-size:12.5px;font-weight:600;
+    cursor:pointer;margin-bottom:16px;
+  }
+  .mini-add .plus{
+    width:20px;height:20px;border-radius:6px;background:var(--accent-soft);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .mini-add .plus svg{width:11px;height:11px;}
+  .mini-add:hover{text-decoration:underline;}
+
+  .file-drop{
+    border:1.5px dashed var(--border);border-radius:9px;padding:16px;text-align:center;
+    color:var(--text-faint);font-size:12px;margin-bottom:4px;
+  }
+  .file-drop b{color:var(--accent);cursor:pointer;font-weight:600;}
+  .or-sep{
+    display:flex;align-items:center;gap:10px;color:var(--text-faint);font-size:11px;margin:14px 0;
+  }
+  .or-sep::before,.or-sep::after{content:"";flex:1;height:1px;background:var(--border-soft);}
+
+  .btn-full{
+    width:100%;background:var(--accent);color:#fff;border:none;border-radius:9px;
+    padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;
+  }
+  .btn-full:hover{background:#2159c9;}
+  .drawer-note{font-size:11.5px;color:var(--text-faint);text-align:center;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<main class="main">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Заявки на оплату</div>
+      <div class="page-sub">Реестр платежей — Климэйт, ИП Малярчук, ИП Пюра</div>
+    </div>
+    <button class="btn-primary" onclick="openDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      Новая заявка
+    </button>
+  </div>
+
+  <div class="card filters">
+    <input id="fNo" type="text" placeholder="№ заявки" style="width:100px;">
+
+    <select id="fArticle">
+      <option value="">Статья</option>
+    </select>
+
+    <select id="fAccount">
+      <option value="">Счёт оплаты</option>
+    </select>
+
+    <select id="fContractor">
+      <option value="">Контрагент</option>
+    </select>
+
+    <select id="fEmployee">
+      <option value="">Контрагент (сотрудник)</option>
+    </select>
+
+    <select id="fAuthor">
+      <option value="">Автор</option>
+    </select>
+
+    <button class="btn-search" onclick="renderRows()">Поиск</button>
+    <button class="btn-ghost" onclick="resetFilters()">Сброс</button>
+    <button class="btn-add" onclick="openDrawer()">+</button>
+
+    <div class="spacer"></div>
+    <div class="toggle-wrap">
+      Скрыть оплаченные
+      <div class="switch" id="hidePaidSwitch" onclick="toggleHidePaid()"><div class="knob"></div></div>
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:34px;"><input type="checkbox" class="checkbox"></th>
+            <th>№</th>
+            <th>Дата</th>
+            <th>Контрагент</th>
+            <th>Статья расхода</th>
+            <th>Счёт оплаты</th>
+            <th class="right">Сумма</th>
+            <th>Док 1</th>
+            <th>Док 2</th>
+            <th>ЗРС</th>
+            <th>Заявка</th>
+            <th>Фин. дир.</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="table-foot">
+      <span id="rowCount"></span>
+      <span>Загружено за 0.021 сек.</span>
+    </div>
+  </div>
+</main>
+
+<!-- ---------------- Drawer: новая заявка ---------------- -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <h2>Новая заявка</h2>
+      <div class="sub">Заявка на оплату</div>
+    </div>
+    <div class="drawer-close" onclick="closeDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+    </div>
+  </div>
+
+  <div class="drawer-body">
+    <div class="field">
+      <label>Контрагент</label>
+      <div class="field-box">
+        <input type="text" list="contractorList" placeholder="Поиск контрагента">
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Статья расхода</label>
+      <div class="field-box select">
+        <select id="drawerArticle"><option value=""></option></select>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9l4 4 4-4"/><path d="M8 15l4-4 4 4"/></svg>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Номер заявки</label>
+        <div class="field-box"><input type="text" placeholder="напр. 165"></div>
+      </div>
+      <div class="field">
+        <label>Сумма</label>
+        <div class="field-box"><input type="text" placeholder="0,00 ₽"></div>
+      </div>
+    </div>
+
+    <div class="mini-add"><div class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>Загрузить счёт</div>
+    <div class="mini-add"><div class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>Загрузить ЗРС</div>
+
+    <div class="field">
+      <label>Ссылка на подтверждающий документ</label>
+      <div class="field-box"><textarea placeholder="https://..."></textarea></div>
+    </div>
+
+    <div class="or-sep">или загрузить файлы</div>
+    <div class="file-drop">Перетащите файл сюда или <b>выберите на компьютере</b></div>
+
+    <div class="field" style="margin-top:22px;">
+      <label>Описание</label>
+      <div class="field-box"><textarea placeholder="Комментарий к заявке"></textarea></div>
+    </div>
+
+    <div class="field">
+      <label>Откуда платим</label>
+      <div class="field-box select">
+        <select id="drawerAccount"><option value=""></option></select>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9l4 4 4-4"/><path d="M8 15l4-4 4 4"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-foot" style="flex-direction:column;">
+    <button class="btn-full" onclick="submitDrawer()">Добавить заявку</button>
+    <div class="drawer-note">Заявка попадёт в реестр со статусом «На подпись»</div>
+  </div>
+</div>
+
+<datalist id="contractorList"></datalist>
+
+<script>
+/* ---------------- reference lists ---------------- */
+const ARTICLES = [
+  "HR расходы","IT специалист","Агентское вознаграждение","Аренда офиса","Аренда склада",
+  "Банковские расходы","Бухгалтер","Водитель","Делопроизводитель","Дивиденды",
+  "Доходы от продаж","Другие маркетинговые издержки","Закупка материалов","Закупка оборудования",
+  "ИП Капатиа налог","ИП Малярчук налог","ИП Пашкова налог","ИП Пюра налог","ИП Чеботок налог",
+  "Исполнительный директор","Маркетолог","Менеджер по продажам","Налог за сотрудников",
+  "Начальник отдела планирования","Оплата за контекстную рекламу","Оплата топлива",
+  "Программное обеспечение","Специалист отделения сервиса"
+];
+
+const ACCOUNTS = [
+  "ИП Малярчук В. (Точка Банк)","ИП Капатиа Алина Исламовна","ИП Пашкова (Точка)",
+  "ИП Пюра (Точка Банк)","ИП Ребчинская","ИП Чеботок (Точка Банк)",
+  "Наличные деньги (Тинькофф Банк)","ООО «Климатические услуги» (Точка Банк)","ООО «Климэйт» (Точка Банк)"
+];
+
+const CONTRACTORS = [
+  "МИ ФНС России по управлению долгом","ООО «СМБ-Сервис»","ООО \"Яндекс\"","«Мувикс» ООО",
+  "Нэтуан Рус ООО","ООО «Армада»","ООО «ЭлектроГуру»","ООО «ПХС»",
+  "ИП Жержерунова Анна Александровна","ООО «Транскул»","ИП Малярчук Виталий Владимирович",
+  "Широченко Андрей","Русаков Никита","Потапов Денис","Мацкайлов Сергей","Зубков Сергей","Дё Святослав"
+];
+
+const AUTHORS = [
+  "admin","Жержерунова Анна","Корецкий Олег","Малярчук Виталий","Пюра Александра",
+  "Пюра Николай","Сабинина Елена","Сапоженков Андрей","Чеботок Георгий","Чеботок Степан"
+];
+
+/* ---------------- icons ---------------- */
+const iconUser = `<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/>`;
+const iconDocPath = `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>`;
+const iconExternalPath = `<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/>`;
+const iconInfoPath = `<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>`;
+const iconArrowPath = `<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>`;
+const iconCheck = `<path d="M4 12l5 5L20 6"/>`;
+const iconX = `<path d="M18 6L6 18"/><path d="M6 6l12 12"/>`;
+const iconRuble = `<path d="M7 15h6a3.5 3.5 0 1 0 0-7H8v13"/><path d="M6 11h9"/><path d="M6 14h9"/>`;
+const iconCopyPath = `<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>`;
+
+/* ---------------- data ---------------- */
+let data = [
+  {no:19734,date:"03.07.2026",contractor:"МИ ФНС России по управлению долгом",article:"ИП Малярчук налог",account:"ИП Малярчук В. (Точка Банк)",sum:10973.0,doc1:true,doc2:false,zrs:true,app:3341,author:"admin",status:"paid"},
+  {no:19733,date:"02.07.2026",contractor:"ООО «СМБ-Сервис»",article:"Оплата за контекстную рекламу",account:"ООО «Климэйт» (Точка Банк)",sum:10000.0,doc1:true,doc2:false,zrs:true,app:4,author:"Малярчук Виталий",status:"paid"},
+  {no:19732,date:"02.07.2026",contractor:"ООО \"Яндекс\"",article:"Оплата за контекстную рекламу",account:"ООО «Климэйт» (Точка Банк)",sum:40000.0,doc1:true,doc2:false,zrs:true,app:4,author:"Малярчук Виталий",status:"paid"},
+  {no:19731,date:"02.07.2026",contractor:"«Мувикс» ООО",article:"Программное обеспечение",account:"ООО «Климэйт» (Точка Банк)",sum:6468.0,doc1:true,doc2:false,zrs:true,app:1,author:"admin",status:"paid"},
+  {no:19730,date:"02.07.2026",contractor:"Нэтуан Рус ООО",article:"Программное обеспечение",account:"ИП Малярчук В. (Точка Банк)",sum:5514.0,doc1:true,doc2:false,zrs:true,app:1,author:"admin",status:"paid"},
+  {no:19729,date:"02.07.2026",contractor:"ООО «Армада»",article:"Закупка материалов",account:"ООО «Климэйт» (Точка Банк)",sum:40040.0,doc1:true,doc2:false,zrs:true,app:3352,author:"Сабинина Елена",status:"paid"},
+  {no:19728,date:"02.07.2026",contractor:"ООО «ЭлектроГуру»",article:"Закупка материалов",account:"ООО «Климэйт» (Точка Банк)",sum:29797.9,doc1:true,doc2:false,zrs:true,app:3350,author:"Сабинина Елена",status:"paid"},
+  {no:19727,date:"02.07.2026",contractor:"ООО «ПХС»",article:"Закупка материалов",account:"ООО «Климэйт» (Точка Банк)",sum:49461.9,doc1:true,doc2:false,zrs:true,app:3350,author:"Сабинина Елена",status:"paid"},
+  {no:19726,date:"02.07.2026",contractor:"ИП Жержерунова Анна Александровна",article:"Налог за сотрудников",account:"ИП Пюра (Точка Банк)",sum:1135.0,doc1:false,doc2:false,zrs:true,app:105,author:"Пюра Александра",status:"paid"},
+  {no:19725,date:"02.07.2026",contractor:"ИП Жержерунова Анна Александровна",article:"Менеджер по продажам",account:"ИП Пюра (Точка Банк)",sum:16208.0,doc1:true,doc2:false,zrs:true,app:105,author:"Пюра Александра",status:"paid"},
+  {no:19724,date:"02.07.2026",contractor:"ООО «Транскул»",article:"Закупка материалов",account:"ООО «Климэйт» (Точка Банк)",sum:17500.0,doc1:true,doc2:false,zrs:true,app:3349,author:"Сабинина Елена",status:"paid"},
+  {no:19723,date:"02.07.2026",contractor:"ООО «ЭлектроГуру»",article:"Закупка материалов",account:"ООО «Климэйт» (Точка Банк)",sum:2041.2,doc1:true,doc2:false,zrs:true,app:3348,author:"Сабинина Елена",status:"paid"},
+  {no:19722,date:"02.07.2026",contractor:"ИП Малярчук Виталий Владимирович",article:"Начальник отдела планирования",account:"ИП Малярчук В. (Точка Банк)",sum:58747.9,doc1:false,doc2:false,zrs:true,app:110,author:"Малярчук Виталий",status:"paid"},
+  {no:19721,date:"02.07.2026",contractor:"Широченко Андрей",article:"Налог за сотрудников",account:"ИП Малярчук В. (Точка Банк)",sum:3249.4,doc1:false,doc2:false,zrs:true,app:164,author:"admin",status:"paid"},
+  {no:19720,date:"02.07.2026",contractor:"Широченко Андрей",article:"Специалист отделения сервиса",account:"ИП Малярчук В. (Точка Банк)",sum:46420.0,doc1:false,doc2:true,zrs:true,app:164,author:"admin",status:"paid"},
+  {no:19719,date:"02.07.2026",contractor:"Русаков Никита",article:"Налог за сотрудников",account:"ИП Малярчук В. (Точка Банк)",sum:3410.7,doc1:false,doc2:false,zrs:true,app:166,author:"admin",status:"paid"},
+  {no:19718,date:"02.07.2026",contractor:"Русаков Никита",article:"Закупка материалов",account:"ИП Малярчук В. (Точка Банк)",sum:3404.0,doc1:false,doc2:true,zrs:true,app:166,author:"admin",status:"paid"},
+  {no:19717,date:"02.07.2026",contractor:"Русаков Никита",article:"Специалист отделения сервиса",account:"ИП Малярчук В. (Точка Банк)",sum:45320.0,doc1:false,doc2:true,zrs:true,app:166,author:"admin",status:"paid"},
+  {no:19716,date:"02.07.2026",contractor:"Потапов Денис",article:"Налог за сотрудников",account:"ИП Малярчук В. (Точка Банк)",sum:3251.4,doc1:false,doc2:false,zrs:true,app:123,author:"admin",status:"paid"},
+  {no:19715,date:"02.07.2026",contractor:"Потапов Денис",article:"Закупка материалов",account:"ИП Малярчук В. (Точка Банк)",sum:3000.0,doc1:false,doc2:false,zrs:true,app:123,author:"admin",status:"paid"},
+  {no:19714,date:"02.07.2026",contractor:"Потапов Денис",article:"Оплата топлива",account:"ИП Малярчук В. (Точка Банк)",sum:5512.0,doc1:false,doc2:true,zrs:true,app:123,author:"admin",status:"paid"},
+  {no:19713,date:"02.07.2026",contractor:"Потапов Денис",article:"Специалист отделения сервиса",account:"ИП Малярчук В. (Точка Банк)",sum:37936.8,doc1:false,doc2:true,zrs:true,app:123,author:"admin",status:"paid"},
+  {no:19709,date:"02.07.2026",contractor:"Мацкайлов Сергей",article:"Налог за сотрудников",account:"ИП Малярчук В. (Точка Банк)",sum:4150.9,doc1:false,doc2:false,zrs:true,app:158,author:"admin",status:"paid"},
+  {no:19708,date:"02.07.2026",contractor:"Мацкайлов Сергей",article:"Закупка материалов",account:"ИП Малярчук В. (Точка Банк)",sum:5668.0,doc1:false,doc2:true,zrs:true,app:158,author:"admin",status:"paid"},
+  {no:19707,date:"02.07.2026",contractor:"Мацкайлов Сергей",article:"Оплата топлива",account:"ИП Малярчук В. (Точка Банк)",sum:11630.6,doc1:false,doc2:true,zrs:true,app:158,author:"admin",status:"paid"},
+  {no:19706,date:"02.07.2026",contractor:"Мацкайлов Сергей",article:"Специалист отделения сервиса",account:"ИП Малярчук В. (Точка Банк)",sum:42000.0,doc1:false,doc2:true,zrs:true,app:158,author:"admin",status:"paid"},
+  {no:19705,date:"02.07.2026",contractor:"Зубков Сергей",article:"Налог за сотрудников",account:"ИП Малярчук В. (Точка Банк)",sum:3607.3,doc1:false,doc2:false,zrs:true,app:168,author:"admin",status:"paid"},
+  {no:19704,date:"02.07.2026",contractor:"Зубков Сергей",article:"Специалист отделения сервиса",account:"ИП Малярчук В. (Точка Банк)",sum:51532.4,doc1:false,doc2:true,zrs:true,app:168,author:"admin",status:"paid"},
+  {no:19703,date:"02.07.2026",contractor:"Дё Святослав",article:"Налог за сотрудников",account:"ИП Малярчук В. (Точка Банк)",sum:4456.0,doc1:false,doc2:false,zrs:true,app:165,author:"admin",status:"paid"},
+  {no:19702,date:"02.07.2026",contractor:"Дё Святослав",article:"Оплата топлива",account:"ИП Малярчук В. (Точка Банк)",sum:11618.6,doc1:false,doc2:true,zrs:true,app:165,author:"admin",status:"paid"},
+  {no:19701,date:"02.07.2026",contractor:"Дё Святослав",article:"Специалист отделения сервиса",account:"ИП Малярчук В. (Точка Банк)",sum:52038.0,doc1:false,doc2:true,zrs:true,app:165,author:"admin",status:"paid"},
+  {no:19735,date:"06.07.2026",contractor:"Тестовый",article:"HR расходы",account:"",sum:1212.0,doc1:false,doc2:false,zrs:false,app:1,author:"admin",status:"new"}
+];
+
+let editingReasonFor = null;
+
+function fmt(n){
+  return n.toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1});
+}
+function initials(name){
+  const parts = name.replace(/["«»]/g,'').split(' ').filter(Boolean);
+  return (parts[0]?.[0]||'') + (parts[1]?.[0]||'');
+}
+
+/* ---------------- filters setup ---------------- */
+function fillSelect(id, list){
+  const el = document.getElementById(id);
+  list.forEach(v=>{
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    el.appendChild(o);
+  });
+}
+fillSelect('fArticle', ARTICLES);
+fillSelect('fAccount', ACCOUNTS);
+fillSelect('fContractor', CONTRACTORS);
+fillSelect('fEmployee', CONTRACTORS.filter(c => !/ООО|МИ ФНС|"|«/.test(c)));
+fillSelect('fAuthor', AUTHORS);
+fillSelect('drawerArticle', ARTICLES);
+fillSelect('drawerAccount', ACCOUNTS);
+document.getElementById('contractorList').innerHTML = CONTRACTORS.map(c=>`<option value="${c}">`).join('');
+
+function resetFilters(){
+  document.getElementById('fNo').value='';
+  ['fArticle','fAccount','fContractor','fEmployee','fAuthor'].forEach(id=>document.getElementById(id).value='');
+  renderRows();
+}
+
+/* ---------------- render ---------------- */
+function statusCell(r, idx){
+  if(r.status === 'new'){
+    return `
+      <div class="approve-cell">
+        <button class="circle-btn approve" title="Подписать" onclick="approve(${idx})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">${iconCheck}</svg>
+        </button>
+        <button class="circle-btn decline" title="Отклонить" onclick="startDecline(${idx})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">${iconX}</svg>
+        </button>
+      </div>`;
+  }
+  if(r.status === 'signed'){
+    return `
+      <div class="approve-cell">
+        <span class="signed-tag">Подписан <span class="x" title="Отменить подпись" onclick="unsign(${idx})">✕</span></span>
+        <button class="circle-btn pay" title="Оплатить" onclick="pay(${idx})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconRuble}</svg>
+        </button>
+      </div>`;
+  }
+  if(r.status === 'paid'){
+    return `<span class="pill paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${iconCheck}</svg>Оплачен</span>`;
+  }
+  if(r.status === 'rejected'){
+    return `<span class="pill rejected" title="${r.reason || ''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${iconX}</svg>Отклонён</span>`;
+  }
+  return '';
+}
+
+function renderRows(){
+  const tbody = document.getElementById('rows');
+  const hidePaid = document.getElementById('hidePaidSwitch').classList.contains('on');
+
+  const fNo = document.getElementById('fNo').value.trim();
+  const fArticle = document.getElementById('fArticle').value;
+  const fAccount = document.getElementById('fAccount').value;
+  const fContractor = document.getElementById('fContractor').value;
+  const fEmployee = document.getElementById('fEmployee').value;
+  const fAuthor = document.getElementById('fAuthor').value;
+
+  let visible = data.filter(r=>{
+    if(hidePaid && r.status === 'paid') return false;
+    if(fNo && String(r.app) !== fNo && String(r.no) !== fNo) return false;
+    if(fArticle && r.article !== fArticle) return false;
+    if(fAccount && r.account !== fAccount) return false;
+    if(fContractor && r.contractor !== fContractor) return false;
+    if(fEmployee && r.contractor !== fEmployee) return false;
+    if(fAuthor && r.author !== fAuthor) return false;
+    return true;
+  });
+
+  tbody.innerHTML = visible.map(r=>{
+    const idx = data.indexOf(r);
+    let rows = `
+    <tr>
+      <td><input type="checkbox" class="checkbox"></td>
+      <td class="app-id">${r.no}</td>
+      <td>${r.date}</td>
+      <td>
+        <div class="contractor">
+          <div class="ic" title="Автор заявки: ${r.author}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconUser}</svg></div>
+          <span class="contractor-name" title="${r.contractor}">${r.contractor}</span>
+        </div>
+      </td>
+      <td class="article">${r.article}</td>
+      <td class="account">${r.account || '—'}</td>
+      <td class="sum">${fmt(r.sum)} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconArrowPath}</svg></td>
+      <td>${r.doc1 ? `<svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconDocPath}</svg>` : ''}</td>
+      <td>${r.doc2 ? `<svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconExternalPath}</svg>` : ''}</td>
+      <td>${r.zrs ? `<svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconInfoPath}</svg>` : ''}</td>
+      <td class="app-id">${r.app}</td>
+      <td>${statusCell(r, idx)}</td>
+      <td>
+        <button class="row-action" title="Копировать"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconCopyPath}</svg></button>
+      </td>
+    </tr>`;
+    if(editingReasonFor === idx){
+      rows += `
+      <tr class="reason-row">
+        <td></td>
+        <td colspan="11">
+          <div class="reason-box">
+            <input type="text" id="reasonInput" placeholder="Причина отклонения..." value="${r.reason||''}">
+            <span class="save-link" onclick="saveReason(${idx})">Сохранить</span>
+          </div>
+          <div class="reason-note">Заявитель увидит эту причину и сможет отредактировать заявку.</div>
+        </td>
+      </tr>`;
+    }
+    return rows;
+  }).join('');
+
+  document.getElementById('rowCount').textContent = `${visible.length} заявок из ${data.length}`;
+}
+
+/* ---------------- status actions ---------------- */
+function approve(idx){ data[idx].status='signed'; renderRows(); }
+function unsign(idx){ data[idx].status='new'; renderRows(); }
+function pay(idx){ data[idx].status='paid'; renderRows(); }
+function startDecline(idx){ editingReasonFor = idx; renderRows(); setTimeout(()=>document.getElementById('reasonInput')?.focus(),0); }
+function saveReason(idx){
+  const val = document.getElementById('reasonInput').value.trim();
+  data[idx].reason = val || 'Без указания причины';
+  data[idx].status = 'rejected';
+  editingReasonFor = null;
+  renderRows();
+}
+
+function toggleHidePaid(){
+  document.getElementById('hidePaidSwitch').classList.toggle('on');
+  renderRows();
+}
+
+/* ---------------- drawer ---------------- */
+function openDrawer(){
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+function submitDrawer(){
+  closeDrawer();
+}
+
+renderRows();
+</script>
+
+</body>
+</html>
