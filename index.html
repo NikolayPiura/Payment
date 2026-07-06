@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Климэйт · Заявки на оплату</title>
+<title>Климэйт ERP · Заявки на оплату</title>
 <style>
   :root{
-    --bg:#f6f7f9;
+    --bg:#f4f5f8;
     --panel:#ffffff;
     --border:#e6e8ec;
     --border-soft:#eef0f3;
@@ -16,10 +16,10 @@
     --accent-soft:#eaf1ff;
     --green:#12875a;
     --green-soft:#e7f7ef;
-    --amber:#b8860b;
-    --amber-soft:#fdf5e2;
     --red:#d94848;
     --red-soft:#fdeceb;
+    --navy:#1c2438;
+    --navy-2:#252e46;
     --radius:10px;
     --mono: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
   }
@@ -32,98 +32,132 @@
     font-size:13.5px;
   }
 
-  .main{max-width:1440px;margin:0 auto;padding:26px 28px 60px 28px;}
-  .page-head{
-    display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:18px;
+  .topbar{
+    height:40px;background:var(--navy);display:flex;align-items:center;
+    justify-content:flex-end;padding:0 18px;position:relative;
   }
+  .user-chip{
+    display:flex;align-items:center;gap:6px;color:#fff;font-size:12.5px;font-weight:600;
+    background:var(--navy-2);padding:6px 12px;border-radius:20px;cursor:pointer;
+  }
+  .user-chip svg{width:12px;height:12px;opacity:.7;}
+  .user-chip .av{
+    width:20px;height:20px;border-radius:50%;background:#3d4a6b;color:#cfd7ec;
+    display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;
+  }
+
+  .app-shell{display:flex;align-items:stretch;min-height:calc(100vh - 40px);}
+
+  /* ---------- Sidebar (decorative, matches internal ERP) ---------- */
+  .sidebar{
+    width:82px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:2px;
+  }
+  .side-item{
+    width:100%;display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:9px 4px;color:var(--text-faint);cursor:default;user-select:none;
+  }
+  .side-item svg{width:19px;height:19px;}
+  .side-item span{font-size:9.5px;font-weight:600;letter-spacing:.01em;text-align:center;}
+  .side-item.active{color:var(--accent);position:relative;}
+  .side-item.active::before{
+    content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--accent);border-radius:0 3px 3px 0;
+  }
+  .side-item.active span{color:var(--accent);}
+
+  /* ---------- Main ---------- */
+  .main{flex:1;min-width:0;padding:22px 26px 48px 26px;}
+  .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
   .page-title{font-size:19px;font-weight:700;}
   .page-sub{font-size:12.5px;color:var(--text-dim);margin-top:2px;}
   .btn-primary{
-    background:var(--accent);color:#fff;border:none;
-    padding:9px 16px;border-radius:8px;font-weight:600;font-size:13px;
-    cursor:pointer;display:flex;align-items:center;gap:6px;
+    background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:8px;
+    font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;
+    box-shadow:0 6px 16px rgba(47,111,237,.25);
   }
   .btn-primary:hover{background:#2159c9;}
   .btn-primary svg{width:15px;height:15px;}
 
-  .card{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);}
+
+  /* ---------- filter bar ---------- */
+  .filters-card{padding:16px 18px;margin-bottom:14px;}
+  .filters-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .filters-bottom{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-soft);}
+
+  .search-box{
+    display:flex;align-items:center;gap:7px;border:1px solid var(--border);background:#fbfbfc;
+    border-radius:8px;padding:7px 11px;width:150px;
   }
-  .filters{
-    padding:14px 16px;
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:8px;
-    margin-bottom:14px;
-  }
-  .filters select, .filters input[type=text]{
-    border:1px solid var(--border);
-    background:#fbfbfc;
-    border-radius:7px;
-    padding:7px 10px;
-    font-size:12.5px;
-    color:var(--text);
-    min-width:130px;
-    max-width:210px;
-  }
-  .filters select:focus, .filters input:focus{outline:2px solid var(--accent-soft);border-color:var(--accent);}
-  .btn-ghost{
-    border:1px solid var(--border);
-    background:#fff;
-    border-radius:7px;
-    padding:7px 12px;
-    font-size:12.5px;
-    color:var(--text-dim);
-    cursor:pointer;
-  }
-  .btn-ghost:hover{background:var(--border-soft);color:var(--text);}
+  .search-box svg{width:14px;height:14px;color:var(--text-faint);flex-shrink:0;}
+  .search-box input{border:none;outline:none;background:transparent;font-size:12.5px;width:100%;color:var(--text);}
+
   .btn-search{
-    border:none;background:var(--accent);color:#fff;
-    border-radius:7px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer;
+    border:none;background:var(--accent);color:#fff;border-radius:8px;padding:8px 16px;
+    font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;
   }
   .btn-search:hover{background:#2159c9;}
-  .btn-add{
-    width:32px;height:32px;border-radius:7px;border:1px solid var(--border);
-    background:#fff;color:var(--text-dim);font-size:16px;cursor:pointer;flex-shrink:0;
+  .btn-search svg{width:13px;height:13px;}
+  .btn-ghost{
+    border:1px solid var(--border);background:#fff;border-radius:8px;padding:8px 14px;
+    font-size:12.5px;color:var(--text-dim);cursor:pointer;display:flex;align-items:center;gap:6px;
   }
-  .btn-add:hover{background:var(--border-soft);}
-  .filters .spacer{flex:1;}
-  .toggle-wrap{
-    display:flex;align-items:center;gap:8px;
-    font-size:12.5px;color:var(--text-dim);white-space:nowrap;
+  .btn-ghost:hover{background:var(--border-soft);color:var(--text);}
+  .btn-ghost svg{width:13px;height:13px;}
+  .btn-add-filter{
+    width:34px;height:34px;border-radius:8px;border:1px dashed var(--border);background:#fff;
+    color:var(--text-faint);font-size:16px;cursor:pointer;flex-shrink:0;
   }
-  .switch{
-    position:relative;width:34px;height:19px;border-radius:20px;
-    background:#d7dbe1;cursor:pointer;transition:.15s;flex-shrink:0;
-  }
-  .switch.on{background:var(--accent);}
-  .switch .knob{
-    position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;
-    background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25);
-  }
-  .switch.on .knob{left:17px;}
+  .btn-add-filter:hover{background:var(--border-soft);color:var(--accent);border-color:var(--accent);}
 
+  .spacer{flex:1;}
+  .toggle-wrap{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--text-dim);white-space:nowrap;font-weight:500;}
+  .switch{position:relative;width:36px;height:20px;border-radius:20px;background:#d7dbe1;cursor:pointer;transition:.15s;flex-shrink:0;}
+  .switch.on{background:var(--accent);}
+  .switch .knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25);}
+  .switch.on .knob{left:18px;}
+
+  /* ---------- custom select ---------- */
+  .csel{position:relative;min-width:150px;}
+  .csel-btn{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    border:1px solid var(--border);background:#fbfbfc;border-radius:8px;padding:7.5px 10px;
+    font-size:12.5px;cursor:pointer;color:var(--text);transition:border-color .12s;
+  }
+  .csel-btn:hover{border-color:#c7cedb;}
+  .csel.open .csel-btn{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .csel-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .csel-label.placeholder{color:var(--text-faint);}
+  .csel-chevron{width:13px;height:13px;color:var(--text-faint);flex-shrink:0;transition:transform .15s;}
+  .csel.open .csel-chevron{transform:rotate(180deg);}
+  .csel-panel{
+    position:absolute;top:calc(100% + 6px);left:0;min-width:240px;width:max-content;max-width:320px;
+    background:#fff;border:1px solid var(--border);border-radius:11px;
+    box-shadow:0 16px 32px rgba(20,24,33,.16);padding:8px;z-index:60;display:none;
+  }
+  .csel.align-right .csel-panel{left:auto;right:0;}
+  .csel.open .csel-panel{display:block;}
+  .csel-search{width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 9px;font-size:12.5px;margin-bottom:6px;outline:none;}
+  .csel-search:focus{border-color:var(--accent);}
+  .csel-list{max-height:260px;overflow-y:auto;}
+  .csel-item{display:flex;align-items:center;gap:8px;padding:7.5px 9px;border-radius:7px;font-size:12.5px;cursor:pointer;color:var(--text);}
+  .csel-item:hover{background:var(--border-soft);}
+  .csel-item.selected{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  .csel-item .chk{width:13px;height:13px;flex-shrink:0;color:var(--accent);}
+  .csel-item .chk-empty{width:13px;flex-shrink:0;}
+  .csel-empty{padding:12px;font-size:12px;color:var(--text-faint);text-align:center;}
+
+  /* ---------- table ---------- */
   .table-card{overflow:hidden;}
   .table-scroll{overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;min-width:1220px;}
+  table{width:100%;border-collapse:collapse;min-width:1240px;}
   thead th{
-    position:sticky;top:0;background:#fbfbfc;z-index:1;
-    text-align:left;font-size:11px;font-weight:700;color:var(--text-faint);
-    text-transform:uppercase;letter-spacing:.05em;
-    padding:11px 12px;border-bottom:1px solid var(--border);white-space:nowrap;
+    position:sticky;top:0;background:#fbfbfc;z-index:1;text-align:left;font-size:11px;font-weight:700;
+    color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;padding:11px 12px;
+    border-bottom:1px solid var(--border);white-space:nowrap;
   }
   thead th.right{text-align:right;}
-  tbody td{
-    padding:10px 12px;
-    border-bottom:1px solid var(--border-soft);
-    white-space:nowrap;
-    color:var(--text);
-    vertical-align:middle;
-  }
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--border-soft);white-space:nowrap;color:var(--text);vertical-align:middle;}
   tbody tr:hover{background:#f9fafc;}
   tbody tr:last-child td{border-bottom:none;}
   .checkbox{width:15px;height:15px;accent-color:var(--accent);}
@@ -132,44 +166,30 @@
   .contractor .ic{
     width:22px;height:22px;border-radius:50%;background:#eef0f3;color:#8b93a1;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:default;
-    position:relative;
   }
   .contractor .ic svg{width:12px;height:12px;}
   .contractor-name{font-weight:500;max-width:230px;overflow:hidden;text-overflow:ellipsis;}
 
   .article{color:var(--text-dim);}
   .account{color:var(--text-dim);}
-
   .sum{font-family:var(--mono);font-weight:600;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:6px;}
   .sum svg{width:12px;height:12px;color:var(--text-faint);}
-
   .doc-icon{width:15px;height:15px;color:var(--text-faint);cursor:pointer;}
   .doc-icon:hover{color:var(--accent);}
   .info-icon{width:14px;height:14px;color:var(--text-faint);cursor:pointer;}
-
   .app-id{color:var(--text-dim);font-family:var(--mono);}
 
-  .pill{
-    display:inline-flex;align-items:center;gap:5px;
-    padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap;
-  }
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap;}
   .pill svg{width:11px;height:11px;}
-  .pill.signed{background:var(--accent-soft);color:var(--accent);}
   .pill.paid{background:var(--green-soft);color:var(--green);}
   .pill.rejected{background:var(--red-soft);color:var(--red);}
 
-  .row-action{
-    width:26px;height:26px;border-radius:6px;border:1px solid var(--border);
-    background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
-  }
+  .row-action{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
   .row-action:hover{background:var(--border-soft);}
   .row-action svg{width:13px;height:13px;color:var(--text-dim);}
 
   .approve-cell{display:flex;align-items:center;gap:6px;}
-  .circle-btn{
-    width:26px;height:26px;border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;
-    cursor:pointer;flex-shrink:0;
-  }
+  .circle-btn{width:26px;height:26px;border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
   .circle-btn svg{width:14px;height:14px;}
   .circle-btn.approve{background:var(--green-soft);color:var(--green);}
   .circle-btn.approve:hover{background:var(--green);color:#fff;}
@@ -184,186 +204,172 @@
 
   .reason-row td{background:#fafbfc;padding:10px 12px 14px 12px;}
   .reason-box{display:flex;align-items:center;gap:8px;max-width:420px;}
-  .reason-box input{
-    flex:1;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12.5px;
-  }
+  .reason-box input{flex:1;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12.5px;}
   .reason-box .save-link{color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
   .reason-box .save-link:hover{text-decoration:underline;}
   .reason-note{font-size:11.5px;color:var(--text-faint);margin-top:4px;}
 
-  .table-foot{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 16px;font-size:12px;color:var(--text-faint);
-    border-top:1px solid var(--border);
-  }
+  .table-foot{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;font-size:12px;color:var(--text-faint);border-top:1px solid var(--border);}
 
   ::-webkit-scrollbar{height:8px;width:8px;}
   ::-webkit-scrollbar-thumb{background:#d7dbe1;border-radius:8px;}
 
   /* ---------- Drawer ---------- */
-  .overlay{
-    position:fixed;inset:0;background:rgba(20,24,33,.35);
-    opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:40;
-  }
+  .overlay{position:fixed;inset:0;background:rgba(20,24,33,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:70;}
   .overlay.open{opacity:1;pointer-events:auto;}
-
   .drawer{
-    position:fixed;top:0;right:0;bottom:0;
-    width:460px;max-width:92vw;
-    background:var(--panel);
-    box-shadow:-18px 0 40px rgba(20,24,33,.14);
-    transform:translateX(100%);
-    transition:transform .3s cubic-bezier(.4,0,.2,1);
-    z-index:41;
-    display:flex;flex-direction:column;
+    position:fixed;top:0;right:0;bottom:0;width:460px;max-width:92vw;background:var(--panel);
+    box-shadow:-18px 0 40px rgba(20,24,33,.14);transform:translateX(100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:71;display:flex;flex-direction:column;
   }
   .drawer.open{transform:translateX(0);}
-  .drawer-head{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:20px 24px;border-bottom:1px solid var(--border);
-  }
+  .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);}
   .drawer-head h2{margin:0;font-size:16px;font-weight:700;}
   .drawer-head .sub{font-size:12px;color:var(--text-dim);margin-top:2px;font-weight:400;}
-  .drawer-close{
-    width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:#fff;
-    display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);
-  }
+  .drawer-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);}
   .drawer-close:hover{background:var(--border-soft);}
   .drawer-close svg{width:15px;height:15px;}
   .drawer-body{padding:22px 24px;overflow-y:auto;flex:1;}
-  .drawer-foot{
-    padding:16px 24px;border-top:1px solid var(--border);
-    display:flex;gap:10px;align-items:center;
-  }
+  .drawer-foot{padding:16px 24px;border-top:1px solid var(--border);}
 
   .field{position:relative;margin-bottom:22px;}
-  .field label{
-    position:absolute;top:-8px;left:11px;background:#fff;padding:0 5px;
-    font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:.02em;
-  }
-  .field .req{color:var(--red);}
-  .field-box{
-    border:1px solid var(--border);border-radius:9px;padding:11px 12px;
-    display:flex;align-items:center;gap:8px;background:#fdfdfe;
-  }
+  .field label{position:absolute;top:-8px;left:11px;background:#fff;padding:0 5px;font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:.02em;z-index:2;}
+  .field-box{border:1px solid var(--border);border-radius:9px;padding:11px 12px;display:flex;align-items:center;gap:8px;background:#fdfdfe;}
   .field-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
-  .field-box input, .field-box select, .field-box textarea{
-    border:none;outline:none;background:transparent;font-size:13px;color:var(--text);
-    width:100%;font-family:inherit;
-  }
+  .field-box input, .field-box textarea{border:none;outline:none;background:transparent;font-size:13px;color:var(--text);width:100%;font-family:inherit;}
   .field-box textarea{resize:vertical;min-height:56px;}
-  .field-box.select{cursor:pointer;}
-  .field-box select{appearance:none;cursor:pointer;}
-  .chev{width:13px;height:13px;color:var(--text-faint);flex-shrink:0;}
   .field-row{display:flex;gap:14px;}
   .field-row .field{flex:1;}
 
-  .mini-add{
-    display:flex;align-items:center;gap:7px;color:var(--accent);font-size:12.5px;font-weight:600;
-    cursor:pointer;margin-bottom:16px;
-  }
-  .mini-add .plus{
-    width:20px;height:20px;border-radius:6px;background:var(--accent-soft);
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  }
-  .mini-add .plus svg{width:11px;height:11px;}
-  .mini-add:hover{text-decoration:underline;}
+  .field .csel-btn{border:1px solid var(--border);border-radius:9px;padding:11.5px 12px;background:#fdfdfe;}
+  .field .csel.open .csel-btn{box-shadow:0 0 0 3px var(--accent-soft);border-color:var(--accent);}
+  .field .csel-panel{width:100%;min-width:0;}
 
-  .file-drop{
-    border:1.5px dashed var(--border);border-radius:9px;padding:16px;text-align:center;
-    color:var(--text-faint);font-size:12px;margin-bottom:4px;
+  .upload-row{margin-bottom:12px;}
+  .upload-btn{
+    display:flex;align-items:center;gap:8px;color:var(--accent);font-size:12.5px;font-weight:600;
+    cursor:pointer;padding:9px 12px;border:1px dashed var(--accent-soft);border-radius:9px;background:#fbfdff;
   }
-  .file-drop b{color:var(--accent);cursor:pointer;font-weight:600;}
-  .or-sep{
-    display:flex;align-items:center;gap:10px;color:var(--text-faint);font-size:11px;margin:14px 0;
+  .upload-btn:hover{background:var(--accent-soft);}
+  .upload-btn .plus{width:20px;height:20px;border-radius:6px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .upload-btn .plus svg{width:11px;height:11px;}
+  .upload-chip{
+    display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;
+    background:var(--green-soft);color:var(--green);font-size:12.5px;font-weight:600;
   }
+  .upload-chip svg.doc{width:14px;height:14px;flex-shrink:0;}
+  .upload-chip .fname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .upload-chip .rm{cursor:pointer;color:var(--text-faint);font-weight:400;flex-shrink:0;}
+  .upload-chip .rm:hover{color:var(--red);}
+
+  .file-drop{border:1.5px dashed var(--border);border-radius:9px;padding:16px;text-align:center;color:var(--text-faint);font-size:12px;margin-bottom:4px;cursor:pointer;}
+  .file-drop:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .file-drop b{color:var(--accent);font-weight:600;}
+  .or-sep{display:flex;align-items:center;gap:10px;color:var(--text-faint);font-size:11px;margin:14px 0;}
   .or-sep::before,.or-sep::after{content:"";flex:1;height:1px;background:var(--border-soft);}
 
-  .btn-full{
-    width:100%;background:var(--accent);color:#fff;border:none;border-radius:9px;
-    padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;
-  }
+  .btn-full{width:100%;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;}
   .btn-full:hover{background:#2159c9;}
   .drawer-note{font-size:11.5px;color:var(--text-faint);text-align:center;margin-top:10px;}
 </style>
 </head>
 <body>
 
-<main class="main">
-  <div class="page-head">
-    <div>
-      <div class="page-title">Заявки на оплату</div>
-      <div class="page-sub">Реестр платежей — Климэйт, ИП Малярчук, ИП Пюра</div>
-    </div>
-    <button class="btn-primary" onclick="openDrawer()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-      Новая заявка
-    </button>
+<div class="topbar">
+  <div class="user-chip">
+    <div class="av">ПН</div>
+    Пюра Николай
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
   </div>
+</div>
 
-  <div class="card filters">
-    <input id="fNo" type="text" placeholder="№ заявки" style="width:100px;">
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.6 3-5.6 7-5.6s7 2 7 5.6"/></svg><span>CRM</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8"/><path d="M8 14h5"/></svg><span>Задачи</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Зарплата</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M3 4h2l2.2 11h10.6L20 8H7"/></svg><span>Закупки</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Проекты</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16"/><path d="M7 19v-6"/><path d="M12 19V9"/><path d="M17 19v-9"/></svg><span>Финансы</span></div>
+    <div class="side-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/><path d="M7 14h4"/></svg><span>ПК</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 21V12h6v9"/></svg><span>Склад</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l2-6h10l2 6"/><rect x="2" y="12" width="16" height="6" rx="1.5"/><circle cx="6" cy="20" r="1.4"/><circle cx="14" cy="20" r="1.4"/><path d="M18 14h3l1 4h-4z"/></svg><span>Выезды</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.3"/><rect x="14" y="3" width="7" height="5" rx="1.3"/><rect x="14" y="12" width="7" height="9" rx="1.3"/><rect x="3" y="16" width="7" height="5" rx="1.3"/></svg><span>Дашборд</span></div>
+    <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg><span>Настройки</span></div>
+  </aside>
 
-    <select id="fArticle">
-      <option value="">Статья</option>
-    </select>
-
-    <select id="fAccount">
-      <option value="">Счёт оплаты</option>
-    </select>
-
-    <select id="fContractor">
-      <option value="">Контрагент</option>
-    </select>
-
-    <select id="fEmployee">
-      <option value="">Контрагент (сотрудник)</option>
-    </select>
-
-    <select id="fAuthor">
-      <option value="">Автор</option>
-    </select>
-
-    <button class="btn-search" onclick="renderRows()">Поиск</button>
-    <button class="btn-ghost" onclick="resetFilters()">Сброс</button>
-    <button class="btn-add" onclick="openDrawer()">+</button>
-
-    <div class="spacer"></div>
-    <div class="toggle-wrap">
-      Скрыть оплаченные
-      <div class="switch" id="hidePaidSwitch" onclick="toggleHidePaid()"><div class="knob"></div></div>
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <div class="page-title">Заявки на оплату</div>
+        <div class="page-sub">Реестр платежей — Климэйт, ИП Малярчук, ИП Пюра</div>
+      </div>
+      <button class="btn-primary" onclick="openDrawer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        Новая заявка
+      </button>
     </div>
-  </div>
 
-  <div class="card table-card">
-    <div class="table-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:34px;"><input type="checkbox" class="checkbox"></th>
-            <th>№</th>
-            <th>Дата</th>
-            <th>Контрагент</th>
-            <th>Статья расхода</th>
-            <th>Счёт оплаты</th>
-            <th class="right">Сумма</th>
-            <th>Док 1</th>
-            <th>Док 2</th>
-            <th>ЗРС</th>
-            <th>Заявка</th>
-            <th>Фин. дир.</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="rows"></tbody>
-      </table>
+    <div class="card filters-card">
+      <div class="filters-top">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="fNo" type="text" placeholder="№ заявки">
+        </div>
+        <div class="csel" id="selArticle"></div>
+        <div class="csel" id="selAccount"></div>
+        <div class="csel" id="selContractor"></div>
+        <div class="csel" id="selEmployee"></div>
+        <div class="csel" id="selAuthor"></div>
+      </div>
+      <div class="filters-bottom">
+        <button class="btn-search" onclick="renderRows()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          Поиск
+        </button>
+        <button class="btn-ghost" onclick="resetFilters()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          Сброс
+        </button>
+        <button class="btn-add-filter" title="Добавить фильтр" onclick="openDrawer()">+</button>
+        <div class="spacer"></div>
+        <div class="toggle-wrap">
+          Скрыть оплаченные
+          <div class="switch" id="hidePaidSwitch" onclick="toggleHidePaid()"><div class="knob"></div></div>
+        </div>
+      </div>
     </div>
-    <div class="table-foot">
-      <span id="rowCount"></span>
-      <span>Загружено за 0.021 сек.</span>
+
+    <div class="card table-card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:34px;"><input type="checkbox" class="checkbox"></th>
+              <th>№</th>
+              <th>Дата</th>
+              <th>Контрагент</th>
+              <th>Статья расхода</th>
+              <th>Счёт оплаты</th>
+              <th class="right">Сумма</th>
+              <th>Док 1</th>
+              <th>Док 2</th>
+              <th>ЗРС</th>
+              <th>Заявка</th>
+              <th>Фин. дир.</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="table-foot">
+        <span id="rowCount"></span>
+        <span>Загружено за 0.021 сек.</span>
+      </div>
     </div>
-  </div>
-</main>
+  </main>
+</div>
 
 <!-- ---------------- Drawer: новая заявка ---------------- -->
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
@@ -381,63 +387,56 @@
   <div class="drawer-body">
     <div class="field">
       <label>Контрагент</label>
-      <div class="field-box">
-        <input type="text" list="contractorList" placeholder="Поиск контрагента">
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
+      <div class="csel" id="selDrawerContractor"></div>
     </div>
 
     <div class="field">
       <label>Статья расхода</label>
-      <div class="field-box select">
-        <select id="drawerArticle"><option value=""></option></select>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9l4 4 4-4"/><path d="M8 15l4-4 4 4"/></svg>
-      </div>
+      <div class="csel" id="selDrawerArticle"></div>
     </div>
 
     <div class="field-row">
       <div class="field">
         <label>Номер заявки</label>
-        <div class="field-box"><input type="text" placeholder="напр. 165"></div>
+        <div class="field-box"><input id="inNo" type="text" placeholder="напр. 165"></div>
       </div>
       <div class="field">
         <label>Сумма</label>
-        <div class="field-box"><input type="text" placeholder="0,00 ₽"></div>
+        <div class="field-box"><input id="inSum" type="text" placeholder="0,00 ₽"></div>
       </div>
     </div>
 
-    <div class="mini-add"><div class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>Загрузить счёт</div>
-    <div class="mini-add"><div class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>Загрузить ЗРС</div>
+    <div class="upload-row" id="uploadInvoiceRow"></div>
+    <div class="upload-row" id="uploadZrsRow"></div>
+    <input type="file" id="fileInvoice" style="display:none">
+    <input type="file" id="fileZrs" style="display:none">
 
     <div class="field">
       <label>Ссылка на подтверждающий документ</label>
-      <div class="field-box"><textarea placeholder="https://..."></textarea></div>
+      <div class="field-box"><textarea id="inLink" placeholder="https://..."></textarea></div>
     </div>
 
     <div class="or-sep">или загрузить файлы</div>
-    <div class="file-drop">Перетащите файл сюда или <b>выберите на компьютере</b></div>
+    <div class="file-drop" id="fileDropZone">Перетащите файл сюда или <b>выберите на компьютере</b></div>
+    <input type="file" id="fileExtra" style="display:none">
+    <div id="extraFileChip"></div>
 
     <div class="field" style="margin-top:22px;">
       <label>Описание</label>
-      <div class="field-box"><textarea placeholder="Комментарий к заявке"></textarea></div>
+      <div class="field-box"><textarea id="inDesc" placeholder="Комментарий к заявке"></textarea></div>
     </div>
 
     <div class="field">
       <label>Откуда платим</label>
-      <div class="field-box select">
-        <select id="drawerAccount"><option value=""></option></select>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9l4 4 4-4"/><path d="M8 15l4-4 4 4"/></svg>
-      </div>
+      <div class="csel" id="selDrawerAccount"></div>
     </div>
   </div>
 
-  <div class="drawer-foot" style="flex-direction:column;">
+  <div class="drawer-foot">
     <button class="btn-full" onclick="submitDrawer()">Добавить заявку</button>
     <div class="drawer-note">Заявка попадёт в реестр со статусом «На подпись»</div>
   </div>
 </div>
-
-<datalist id="contractorList"></datalist>
 
 <script>
 /* ---------------- reference lists ---------------- */
@@ -450,20 +449,18 @@ const ARTICLES = [
   "Начальник отдела планирования","Оплата за контекстную рекламу","Оплата топлива",
   "Программное обеспечение","Специалист отделения сервиса"
 ];
-
 const ACCOUNTS = [
   "ИП Малярчук В. (Точка Банк)","ИП Капатиа Алина Исламовна","ИП Пашкова (Точка)",
   "ИП Пюра (Точка Банк)","ИП Ребчинская","ИП Чеботок (Точка Банк)",
   "Наличные деньги (Тинькофф Банк)","ООО «Климатические услуги» (Точка Банк)","ООО «Климэйт» (Точка Банк)"
 ];
-
 const CONTRACTORS = [
   "МИ ФНС России по управлению долгом","ООО «СМБ-Сервис»","ООО \"Яндекс\"","«Мувикс» ООО",
   "Нэтуан Рус ООО","ООО «Армада»","ООО «ЭлектроГуру»","ООО «ПХС»",
   "ИП Жержерунова Анна Александровна","ООО «Транскул»","ИП Малярчук Виталий Владимирович",
   "Широченко Андрей","Русаков Никита","Потапов Денис","Мацкайлов Сергей","Зубков Сергей","Дё Святослав"
 ];
-
+const EMPLOYEES = CONTRACTORS.filter(c => !/ООО|МИ ФНС|"|«/.test(c));
 const AUTHORS = [
   "admin","Жержерунова Анна","Корецкий Олег","Малярчук Виталий","Пюра Александра",
   "Пюра Николай","Сабинина Елена","Сапоженков Андрей","Чеботок Георгий","Чеботок Степан"
@@ -479,6 +476,88 @@ const iconCheck = `<path d="M4 12l5 5L20 6"/>`;
 const iconX = `<path d="M18 6L6 18"/><path d="M6 6l12 12"/>`;
 const iconRuble = `<path d="M7 15h6a3.5 3.5 0 1 0 0-7H8v13"/><path d="M6 11h9"/><path d="M6 14h9"/>`;
 const iconCopyPath = `<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>`;
+const iconPlus = `<path d="M12 5v14"/><path d="M5 12h14"/>`;
+
+/* ---------------- custom select component ---------------- */
+function createSelect(mount, options, placeholder, onChange, alignRight){
+  let value = null;
+  mount.classList.add('csel');
+  if(alignRight) mount.classList.add('align-right');
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'csel-btn';
+  const label = document.createElement('span');
+  label.className = 'csel-label placeholder';
+  label.textContent = placeholder;
+  const chev = document.createElement('span');
+  chev.className = 'csel-chevron';
+  chev.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>`;
+  btn.appendChild(label); btn.appendChild(chev);
+
+  const panel = document.createElement('div');
+  panel.className = 'csel-panel';
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text'; searchInput.className = 'csel-search'; searchInput.placeholder = 'Поиск...';
+  const list = document.createElement('div');
+  list.className = 'csel-list';
+  panel.appendChild(searchInput); panel.appendChild(list);
+
+  mount.innerHTML = '';
+  mount.appendChild(btn); mount.appendChild(panel);
+
+  function renderList(filter){
+    list.innerHTML = '';
+    const clearItem = document.createElement('div');
+    clearItem.className = 'csel-item' + (!value ? ' selected' : '');
+    clearItem.innerHTML = (!value ? `<svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${iconCheck}</svg>` : `<span class="chk-empty"></span>`) + `<span>${placeholder}</span>`;
+    clearItem.onclick = () => select(null);
+    if(!filter) list.appendChild(clearItem);
+
+    const filtered = options.filter(o => o.toLowerCase().includes((filter||'').toLowerCase()));
+    filtered.forEach(o=>{
+      const item = document.createElement('div');
+      item.className = 'csel-item' + (o === value ? ' selected' : '');
+      item.innerHTML = (o === value ? `<svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${iconCheck}</svg>` : `<span class="chk-empty"></span>`) + `<span>${o}</span>`;
+      item.onclick = () => select(o);
+      list.appendChild(item);
+    });
+    if(filtered.length === 0 && filter){
+      const empty = document.createElement('div');
+      empty.className = 'csel-empty'; empty.textContent = 'Ничего не найдено';
+      list.appendChild(empty);
+    }
+  }
+
+  function select(v){
+    value = v;
+    label.textContent = v || placeholder;
+    label.classList.toggle('placeholder', !v);
+    close();
+    onChange && onChange(v);
+  }
+  function open(){
+    document.querySelectorAll('.csel.open').forEach(o=>{ if(o!==mount) o.classList.remove('open'); });
+    mount.classList.add('open');
+    searchInput.value = '';
+    renderList('');
+    setTimeout(()=>searchInput.focus(), 0);
+  }
+  function close(){ mount.classList.remove('open'); }
+
+  btn.onclick = (e)=>{ e.stopPropagation(); mount.classList.contains('open') ? close() : open(); };
+  searchInput.oninput = ()=> renderList(searchInput.value);
+  searchInput.onclick = (e)=> e.stopPropagation();
+
+  renderList('');
+
+  return {
+    get value(){ return value; },
+    set value(v){ select(v); },
+    reset(){ value=null; label.textContent=placeholder; label.classList.add('placeholder'); }
+  };
+}
+document.addEventListener('click', ()=>{
+  document.querySelectorAll('.csel.open').forEach(o=>o.classList.remove('open'));
+});
 
 /* ---------------- data ---------------- */
 let data = [
@@ -518,94 +597,79 @@ let data = [
 
 let editingReasonFor = null;
 
-function fmt(n){
-  return n.toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1});
-}
-function initials(name){
-  const parts = name.replace(/["«»]/g,'').split(' ').filter(Boolean);
-  return (parts[0]?.[0]||'') + (parts[1]?.[0]||'');
-}
+function fmt(n){ return n.toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1}); }
 
-/* ---------------- filters setup ---------------- */
-function fillSelect(id, list){
-  const el = document.getElementById(id);
-  list.forEach(v=>{
-    const o = document.createElement('option');
-    o.value = v; o.textContent = v;
-    el.appendChild(o);
-  });
-}
-fillSelect('fArticle', ARTICLES);
-fillSelect('fAccount', ACCOUNTS);
-fillSelect('fContractor', CONTRACTORS);
-fillSelect('fEmployee', CONTRACTORS.filter(c => !/ООО|МИ ФНС|"|«/.test(c)));
-fillSelect('fAuthor', AUTHORS);
-fillSelect('drawerArticle', ARTICLES);
-fillSelect('drawerAccount', ACCOUNTS);
-document.getElementById('contractorList').innerHTML = CONTRACTORS.map(c=>`<option value="${c}">`).join('');
+/* ---------------- filter selects ---------------- */
+const selArticle = createSelect(document.getElementById('selArticle'), ARTICLES, "Статья", renderRows);
+const selAccount = createSelect(document.getElementById('selAccount'), ACCOUNTS, "Счёт оплаты", renderRows);
+const selContractor = createSelect(document.getElementById('selContractor'), CONTRACTORS, "Контрагент", renderRows);
+const selEmployee = createSelect(document.getElementById('selEmployee'), EMPLOYEES, "Контрагент (сотрудник)", renderRows);
+const selAuthor = createSelect(document.getElementById('selAuthor'), AUTHORS, "Автор", renderRows);
+
+/* ---------------- drawer selects ---------------- */
+const selDrawerContractor = createSelect(document.getElementById('selDrawerContractor'), CONTRACTORS, "Поиск контрагента", null, false);
+const selDrawerArticle = createSelect(document.getElementById('selDrawerArticle'), ARTICLES, "Выберите статью", null, false);
+const selDrawerAccount = createSelect(document.getElementById('selDrawerAccount'), ACCOUNTS, "Выберите счёт", null, true);
 
 function resetFilters(){
-  document.getElementById('fNo').value='';
-  ['fArticle','fAccount','fContractor','fEmployee','fAuthor'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fNo').value = '';
+  selArticle.reset(); selAccount.reset(); selContractor.reset(); selEmployee.reset(); selAuthor.reset();
   renderRows();
 }
 
-/* ---------------- render ---------------- */
+/* ---------------- status cell ---------------- */
 function statusCell(r, idx){
   if(r.status === 'new'){
     return `
       <div class="approve-cell">
-        <button class="circle-btn approve" title="Подписать" onclick="approve(${idx})">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">${iconCheck}</svg>
-        </button>
-        <button class="circle-btn decline" title="Отклонить" onclick="startDecline(${idx})">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">${iconX}</svg>
-        </button>
+        <button class="circle-btn approve" title="Подписать" onclick="approve(${idx})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">${iconCheck}</svg></button>
+        <button class="circle-btn decline" title="Отклонить" onclick="startDecline(${idx})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">${iconX}</svg></button>
       </div>`;
   }
   if(r.status === 'signed'){
     return `
       <div class="approve-cell">
         <span class="signed-tag">Подписан <span class="x" title="Отменить подпись" onclick="unsign(${idx})">✕</span></span>
-        <button class="circle-btn pay" title="Оплатить" onclick="pay(${idx})">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconRuble}</svg>
-        </button>
+        <button class="circle-btn pay" title="Оплатить" onclick="pay(${idx})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconRuble}</svg></button>
       </div>`;
   }
   if(r.status === 'paid'){
     return `<span class="pill paid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${iconCheck}</svg>Оплачен</span>`;
   }
   if(r.status === 'rejected'){
-    return `<span class="pill rejected" title="${r.reason || ''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${iconX}</svg>Отклонён</span>`;
+    return `<span class="pill rejected" title="${r.reason||''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${iconX}</svg>Отклонён</span>`;
   }
   return '';
 }
 
+/* ---------------- render ---------------- */
 function renderRows(){
   const tbody = document.getElementById('rows');
   const hidePaid = document.getElementById('hidePaidSwitch').classList.contains('on');
-
   const fNo = document.getElementById('fNo').value.trim();
-  const fArticle = document.getElementById('fArticle').value;
-  const fAccount = document.getElementById('fAccount').value;
-  const fContractor = document.getElementById('fContractor').value;
-  const fEmployee = document.getElementById('fEmployee').value;
-  const fAuthor = document.getElementById('fAuthor').value;
 
   let visible = data.filter(r=>{
     if(hidePaid && r.status === 'paid') return false;
     if(fNo && String(r.app) !== fNo && String(r.no) !== fNo) return false;
-    if(fArticle && r.article !== fArticle) return false;
-    if(fAccount && r.account !== fAccount) return false;
-    if(fContractor && r.contractor !== fContractor) return false;
-    if(fEmployee && r.contractor !== fEmployee) return false;
-    if(fAuthor && r.author !== fAuthor) return false;
+    if(selArticle.value && r.article !== selArticle.value) return false;
+    if(selAccount.value && r.account !== selAccount.value) return false;
+    if(selContractor.value && r.contractor !== selContractor.value) return false;
+    if(selEmployee.value && r.contractor !== selEmployee.value) return false;
+    if(selAuthor.value && r.author !== selAuthor.value) return false;
     return true;
+  });
+
+  // pending requests (new/signed) always pinned to top, then newest number first
+  visible = visible.slice().sort((a,b)=>{
+    const aPending = (a.status==='new'||a.status==='signed') ? 0 : 1;
+    const bPending = (b.status==='new'||b.status==='signed') ? 0 : 1;
+    if(aPending !== bPending) return aPending - bPending;
+    return b.no - a.no;
   });
 
   tbody.innerHTML = visible.map(r=>{
     const idx = data.indexOf(r);
-    let rows = `
+    let rowHtml = `
     <tr>
       <td><input type="checkbox" class="checkbox"></td>
       <td class="app-id">${r.no}</td>
@@ -624,12 +688,10 @@ function renderRows(){
       <td>${r.zrs ? `<svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconInfoPath}</svg>` : ''}</td>
       <td class="app-id">${r.app}</td>
       <td>${statusCell(r, idx)}</td>
-      <td>
-        <button class="row-action" title="Копировать"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconCopyPath}</svg></button>
-      </td>
+      <td><button class="row-action" title="Копировать"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconCopyPath}</svg></button></td>
     </tr>`;
     if(editingReasonFor === idx){
-      rows += `
+      rowHtml += `
       <tr class="reason-row">
         <td></td>
         <td colspan="11">
@@ -641,7 +703,7 @@ function renderRows(){
         </td>
       </tr>`;
     }
-    return rows;
+    return rowHtml;
   }).join('');
 
   document.getElementById('rowCount').textContent = `${visible.length} заявок из ${data.length}`;
@@ -659,13 +721,54 @@ function saveReason(idx){
   editingReasonFor = null;
   renderRows();
 }
-
 function toggleHidePaid(){
   document.getElementById('hidePaidSwitch').classList.toggle('on');
   renderRows();
 }
 
-/* ---------------- drawer ---------------- */
+/* ---------------- file uploads (drawer) ---------------- */
+function renderUploadRow(rowId, inputId, label){
+  const row = document.getElementById(rowId);
+  const input = document.getElementById(inputId);
+  const file = input.files && input.files[0];
+  if(file){
+    row.innerHTML = `
+      <div class="upload-chip">
+        <svg class="doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconDocPath}</svg>
+        <span class="fname">${file.name}</span>
+        <span class="rm" onclick="clearUpload('${rowId}','${inputId}','${label}')">✕</span>
+      </div>`;
+  } else {
+    row.innerHTML = `
+      <div class="upload-btn" onclick="document.getElementById('${inputId}').click()">
+        <div class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${iconPlus}</svg></div>
+        ${label}
+      </div>`;
+  }
+}
+function clearUpload(rowId, inputId, label){
+  document.getElementById(inputId).value = '';
+  renderUploadRow(rowId, inputId, label);
+}
+document.getElementById('fileInvoice').addEventListener('change', ()=>renderUploadRow('uploadInvoiceRow','fileInvoice','Загрузить счёт'));
+document.getElementById('fileZrs').addEventListener('change', ()=>renderUploadRow('uploadZrsRow','fileZrs','Загрузить ЗРС'));
+renderUploadRow('uploadInvoiceRow','fileInvoice','Загрузить счёт');
+renderUploadRow('uploadZrsRow','fileZrs','Загрузить ЗРС');
+
+document.getElementById('fileDropZone').addEventListener('click', ()=>document.getElementById('fileExtra').click());
+document.getElementById('fileExtra').addEventListener('change', function(){
+  const file = this.files && this.files[0];
+  const chip = document.getElementById('extraFileChip');
+  if(file){
+    chip.innerHTML = `<div class="upload-chip" style="margin-top:8px;">
+      <svg class="doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconDocPath}</svg>
+      <span class="fname">${file.name}</span>
+      <span class="rm" onclick="document.getElementById('fileExtra').value='';document.getElementById('extraFileChip').innerHTML='';">✕</span>
+    </div>`;
+  }
+});
+
+/* ---------------- drawer open/close/submit ---------------- */
 function openDrawer(){
   document.getElementById('overlay').classList.add('open');
   document.getElementById('drawer').classList.add('open');
@@ -674,8 +777,40 @@ function closeDrawer(){
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('drawer').classList.remove('open');
 }
+function resetDrawerForm(){
+  selDrawerContractor.reset(); selDrawerArticle.reset(); selDrawerAccount.reset();
+  document.getElementById('inNo').value = '';
+  document.getElementById('inSum').value = '';
+  document.getElementById('inLink').value = '';
+  document.getElementById('inDesc').value = '';
+  document.getElementById('fileInvoice').value = ''; renderUploadRow('uploadInvoiceRow','fileInvoice','Загрузить счёт');
+  document.getElementById('fileZrs').value = ''; renderUploadRow('uploadZrsRow','fileZrs','Загрузить ЗРС');
+  document.getElementById('fileExtra').value = ''; document.getElementById('extraFileChip').innerHTML = '';
+}
 function submitDrawer(){
+  const contractor = selDrawerContractor.value || 'Новый контрагент';
+  const article = selDrawerArticle.value || '—';
+  const account = selDrawerAccount.value || '';
+  const appNo = document.getElementById('inNo').value.trim() || '1';
+  const sumRaw = document.getElementById('inSum').value.replace(/[^\d,\.]/g,'').replace(',', '.');
+  const sum = parseFloat(sumRaw) || 0;
+
+  const nextNo = Math.max(...data.map(d=>d.no)) + 1;
+  data.push({
+    no: nextNo,
+    date: "06.07.2026",
+    contractor, article, account, sum,
+    doc1: !!document.getElementById('fileInvoice').files.length,
+    doc2: !!document.getElementById('fileZrs').files.length,
+    zrs: !!document.getElementById('fileZrs').files.length,
+    app: appNo,
+    author: "Пюра Николай",
+    status: "new"
+  });
+
   closeDrawer();
+  resetDrawerForm();
+  renderRows();
 }
 
 renderRows();
